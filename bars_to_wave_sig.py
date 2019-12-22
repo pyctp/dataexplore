@@ -14,8 +14,38 @@ lastsig, sigprice, sigall = gen_wave_signals(k2, bars)
 
 print(k2)
 print(len(lastsig), lastsig)
-print(sigprice)
-print(sigall)
+print(len(sigprice), sigprice)
+# print(sigall)
+profit = 0
+profitlist = []
+profittmplist = []
+
+for i in range(len(lastsig)):
+    if i == 0:
+        continue
+
+    else:
+        if lastsig[i] == 'bpk':
+            pricebk = sigprice[i]
+            profittmp = sigprice[i-1] - sigprice[i]
+            profit += profittmp
+        if lastsig[i] == 'spk':
+            pricesk = sigprice[i]
+            profittmp = sigprice[i] - sigprice[i-1]
+            profit += profittmp
+        print(profit, profittmp)
+        profitlist.append(profit)
+        profittmplist.append(profittmp)
+
+print(profit)
+bg0 = []
+sm0 = []
+for i in range(len(profittmplist)):
+    if profittmplist[i]>=0:
+        bg0.append(profittmplist[i])
+    else:
+        sm0.append(profittmplist[i])
+print(len(bg0), len(sm0), len(profittmplist))
 #
 # for i in range(len(bars)):
 #
