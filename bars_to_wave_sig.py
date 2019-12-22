@@ -1,17 +1,81 @@
 # coding:utf-8
 import pandas as pd
 from wavefunc2 import *
-# bars = pd.read_csv('kline.csv')
+#
+# bars = pd.read_csv('tqrb60.csv')
 # bars.rename(columns={"SHFE.rb2005.open":"open","SHFE.rb2005.high":"high","SHFE.rb2005.low":"low","SHFE.rb2005.close":"close"},inplace=True)
-# bars.to_json('bars.json')
+# bars.to_json('tqrb60.json')
+#
+# barstb = pd.read_csv('rb5tb.csv', encoding='gbk')
+# barstb.rename(columns={"时间":"datetime","开盘价":"open","最高价":"high","最低价":"low","收盘价":"close"},inplace=True)
+# barstb.to_json('tbrb5.json')
+
+bars = pd.read_json('tqrb300.json')
+barstb = pd.read_json('tbrb5.json')
+print(len(bars), len(barstb))
+
+def compare_2_bars(bars1, bars2):
+    length = min(len(bars1), len(bars2))
+    time1list = bars1.datetime.to_list()
+    time2list = bars2.datetime.to_list()
+    count = 0
+    for i in range(len(time1list)):
+        if not time1list[i] in time2list:
+            count += 1
+            print(time1list[i], count)
+
+    # for i in range(len(time2list)):
+    #
+    #     if not time2list[i] in time1list:
+    #         count += 1
+    #         print(time1list[i], count)
+    #     print("now comparing:", i)
+    for i in range(length):
+        opent, hight,lowt, closet = bars1.iloc[i].open, bars1.iloc[i].high, bars1.iloc[i].low, bars1.iloc[i].close
+        openb, highb, lowb, closeb = bars2.iloc[i].open, bars2.iloc[i].high, bars2.iloc[i].low, bars2.iloc[i].close
+        # if not opent == openb:
+        #     print(opent, openb, bars1.iloc[i].datetime, 'open diff', i)
+        time1=bars1.iloc[i].datetime
+        time2=bars2.iloc[i].datetime
 
 
-bars = pd.read_json('bars.json')
+        if time1 != time2:
+            print('time diff:', time1, time2)
+        else:
+            continue
 
+        if not hight == highb:
+            print(hight, highb, bars1.iloc[i].datetime, 'high diff', i)
+        # if not lowt == lowb:
+            # print(lowt, lowb, bars1.iloc[i].datetime, 'low diff', i)
+        # if not closet == closeb:
+        #     print(opent, openb, bars1.iloc[i].datetime)
+
+compare_2_bars(bars, barstb)
 k2, g = get_WaveTrader(bars)
 
-lastsig, sigprice, sigall = gen_wave_signals(k2, bars)
+lastsig, sigdetail,  sigprice, sigall = gen_wave_signals(k2, bars)
 
+wenhuasig = pd.read_csv('螺纹2005 15分钟 波段交易.csv', encoding='gbk')
+diffsum = 0
+for i in range(len(sigdetail)):
+    price = sigdetail[i][2]
+    whprice = wenhuasig.iloc[i].价格
+    # print(sigdetail[i][0], price, whprice, price == whprice)
+    tqtime = sigdetail[i][0]
+    whtime = wenhuasig.iloc[i].时间.replace('/', '-',2)
+    tqtimen = str(tqtime)
+    print(tqtime, whtime)
+    if tqtimen != whtime:
+        print(tqtime, whtime, '..........................')
+    # if price != whprice:
+    #     print(sigdetail[i][0], wenhuasig.iloc[i].时间, price, whprice, price == whprice)
+    #     print(price - whprice)
+    #     diffsum += (price - whprice)
+    # if price != wenhuasig.iloc[i+1].价格:
+    #     print('price not equal....')
+
+# print(diffsum)
 print(k2)
 print(len(lastsig), lastsig)
 print(len(sigprice), sigprice)

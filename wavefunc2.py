@@ -156,6 +156,7 @@ def gen_wave_signals(k2, klines):
     #K2 为上面计算出来的列表
 
     lastsig = []
+    lastsigdetail = []
     sigprice = []
     sigall = []
     sigcount = 0
@@ -171,9 +172,14 @@ def gen_wave_signals(k2, klines):
                 sigpricetmp = klines.iloc[i].close
                 sigprice.append(sigpricetmp)
                 sigall.append('bpk')
+                lastsigdetail.append((klines.iloc[i].datetime, 'bpk', klines.iloc[i].close))
             if i == 0 and k2[i] == 1:
                 lastsig.append('spk')
                 sigall.append('spk')
+                sigpricetmp = klines.iloc[i].close
+                sigprice.append(sigpricetmp)
+
+                lastsigdetail.append((klines.iloc[i].datetime, 'spk', klines.iloc[i].close))
             else:
                 pass
 
@@ -182,18 +188,20 @@ def gen_wave_signals(k2, klines):
                 sigpricetmp = klines.iloc[i].close
                 sigprice.append(sigpricetmp)
                 sigall.append('bpk')
+                lastsigdetail.append((klines.iloc[i].datetime, 'bpk', klines.iloc[i].close))
                 sigcount = 0
             elif k2[i-1] != 1 and k2[i] == 1:
                 lastsig.append('spk')
                 sigpricetmp = klines.iloc[i].close
                 sigprice.append(sigpricetmp)
                 sigall.append('spk')
+                lastsigdetail.append((klines.iloc[i].datetime, 'bpk', klines.iloc[i].close))
                 sigcount = 0
             else:
                 sigcount += 1
                 sigall.append(sigcount)
 
-    return lastsig, sigprice, sigall
+    return lastsig, lastsigdetail, sigprice, sigall
 
 
 
