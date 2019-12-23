@@ -70,7 +70,7 @@ def getDayFirstBarOC(bars):
 
 
 # 计算第二部分数据
-OO, CC = getDayFirstBarOC(bars)
+# OO, CC = getDayFirstBarOC(bars)
 
 oo = pd.read_json('oo.json')
 cc = pd.read_json('cc.json')
@@ -133,7 +133,7 @@ for i in range(len(bars)):
 
     if (CbMAA.iloc[i] and K.iloc[i] < 48 and CbREFC.iloc[i]) and (CbBB.iloc[i] and C.iloc[i] > SKPRICE):
         outs = bars.iloc[i].close, MAA.iloc[i], K.iloc[i], BB.iloc[i], TMP.iloc[i], oo.iloc[i], cc.iloc[i],
-        print(outs)
+        # print(outs)
         # BPK(SS)
         lastsig.append([bars.iloc[i].datetime, 'BPK'])
         BKPRICE = bars.iloc[i].close

@@ -17,9 +17,9 @@ def tb_bar_csv_to_json(csvfile):
     barstb.to_json(jsonfile)
 
 
-# tq_bar_csv_to_json('rb2005_60.csv')
-# tq_bar_csv_to_json('rb2005_300.csv')
-# tq_bar_csv_to_json('rb2005_900.csv')
+tq_bar_csv_to_json('rb2005_60.csv')
+tq_bar_csv_to_json('rb2005_300.csv')
+tq_bar_csv_to_json('rb2005_900.csv')
 # tb_bar_csv_to_json('tbrb2005_5.csv')
 
 
