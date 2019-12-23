@@ -1,7 +1,20 @@
 # coding:utf-8
+
+from tqsdk import *
 import pandas as pd
 from wavefunc2 import *
+symbol = 'CSI.000300'
+api = TqApi()
+quote = api.get_quote(symbol)
+klines = api.get_kline_serial(symbol, duration_seconds=300)
 
+while True:
+    api.wait_update()
+    if api.is_changing(quote):
+        print(quote.last_price, quote.datetime, quote.underlying_symbol)
+
+    if api.is_changing(klines.iloc[-1], 'datetime'):
+        print(klines.iloc[-1])
 
 def tq_bar_csv_to_json(csvfile):
     bars = pd.read_csv(csvfile, encoding='gbk')
