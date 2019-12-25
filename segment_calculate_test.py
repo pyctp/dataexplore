@@ -3,6 +3,8 @@ import numpy as np
 from tqsdk.tafunc import (hhv, llv, ma, sma, ema, crossup, crossdown, median, harmean, abs, std, ref, exist, every, time_to_str)
 from myfunction import HHV, LLV
 from datetime import date, datetime
+
+
 bars = pd.read_json('rb2005_900.json')
 O = bars.open
 C = bars.close
@@ -10,6 +12,17 @@ H = bars.high
 L = bars.low
 
 # 交易日的问题
+# 第一部分数据
+
+# 第二部分数据, 完全正确
+
+# 第三部分数据, 完全正确(修改了当日第一条k线判断为21:00的k线,加了信号过滤)
+# TMP:=STD(O+C,93)/2
+# OO:=VALUEWHEN(DATE<>REF(DATE,1),O)
+# CC:=VALUEWHEN(DATE<>REF(DATE,1),C)
+# BB:=MAX(OO,CC)+0.1*5*TMP
+# DD:=MIN(OO,CC)-0.1*5*TMP
+
 
 # 计算第四部分数据  处理完毕,基本正确
 # VAR1 = (2 * C + H + L) / 4
@@ -20,13 +33,6 @@ L = bars.low
 # SH = ema(0.7 * ref(ZL, 1) + 0.3 * ZL, 118)
 #
 
-
-#
-# TMP:=STD(O+C,93)/2
-# OO:=VALUEWHEN(DATE<>REF(DATE,1),O)
-# CC:=VALUEWHEN(DATE<>REF(DATE,1),C)
-# BB:=MAX(OO,CC)+0.1*5*TMP
-# DD:=MIN(OO,CC)-0.1*5*TMP
 
 
 def getDayFirstBarOC(bars):
@@ -65,11 +71,31 @@ def getDayFirstBarOC(bars):
     cc.to_json('cc.json')
     return oo, cc
 
+# 第一部分数据
+# RSV:=(C-LLV(L,63))/(HHV(H,63)-LLV(L,63))*100;
+# K:=SMA(RSV,18,1);
+# MAA:=EMA(C,255);
+# AA:=ABS(C-REF(C,1))>=REF(HHV(ABS(H-L),35),1);
+# AA2:=ABS(C-REF(C,2))>=REF(HHV(ABS(C-REF(C,2)),35),1);
+
+
+llv63 = pd.Series(LLV(L,63))
+hhv63 = pd.Series(HHV(H,63))
+hhvhl35 = pd.Series(HHV(H-L,35))
+hhvc_c35 = pd.Series(HHV(abs(C-ref(C,2)),35))
+
+RSV = (C - llv63) / (hhv63 - llv63) * 100
+K = sma(RSV, 18, 1)
+MAA = ema(C, 255)
+AA = abs(C-ref(C,1)) >= ref(hhvhl35,1)
+AA2 = abs(C-ref(C,2)) >= ref(hhvc_c35,1)
 
 
 
 
-# 计算第二部分数据
+
+
+# 计算第二部分数据 完全正确了.
 # OO, CC = getDayFirstBarOC(bars)
 
 oo = pd.read_json('oo.json')
@@ -135,9 +161,11 @@ for i in range(len(bars)):
         outs = bars.iloc[i].close, MAA.iloc[i], K.iloc[i], BB.iloc[i], TMP.iloc[i], oo.iloc[i], cc.iloc[i],
         # print(outs)
         # BPK(SS)
-        lastsig.append([bars.iloc[i].datetime, 'BPK'])
-        BKPRICE = bars.iloc[i].close
-        bkprice.append(BKPRICE)
+
+        if (not lastsig) or lastsig[-1][1] != 'BPK':
+            lastsig.append([bars.iloc[i].datetime, 'BPK'])
+            BKPRICE = bars.iloc[i].close
+            bkprice.append(BKPRICE)
         sigall.append('BPK')
         sigcount = 0
         print(i, bars.iloc[i].datetime)
@@ -145,9 +173,13 @@ for i in range(len(bars)):
 
     elif (CsMAA.iloc[i] and K.iloc[i] > 39 and CsREFC.iloc[i]) and (CsDD.iloc[i] and C.iloc[i] < BKPRICE):
         # SPK(SS)
-        lastsig.append([bars.iloc[i].datetime, 'SPK'])
-        SKPRICE = bars.iloc[i].close
-        skprice.append(SKPRICE)
+        print(lastsig[-1][1])
+        if (not lastsig) or lastsig[-1][1] != 'SPK':
+            lastsig.append([bars.iloc[i].datetime, 'SPK'])
+            # BKPRICE = bars.iloc[i].close
+            # bkprice.append(BKPRICE)
+            SKPRICE = bars.iloc[i].close
+            skprice.append(SKPRICE)
         sigall.append('SPK')
         sigcount = 0
         print(i, bars.iloc[i].datetime)
@@ -157,9 +189,8 @@ for i in range(len(bars)):
         sigall.append(sigcount)
 
 
-print('   ')
+print('end   ')
 
  # (C>MAA AND K<48 AND C>REF(C,1) AND (C>BB AND C>SKPRICE)) AND FANSHOU=1,BPK(SS);
- #
 
  # (C<MAA AND K>39 AND C<REF(C,1) AND (C<DD AND C<BKPRICE)) AND FANSHOU=1,SPK(SS);

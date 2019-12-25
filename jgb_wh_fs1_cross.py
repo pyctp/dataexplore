@@ -25,11 +25,13 @@ QYMA..EMA(当前, 12),COLorYELLOW,LINETHICK3;
 
 DANGRI:=BARSLAST(DATE<>REF(DATE,1));
 
+
 FANSHOU:=0;
 QBP:=LASTSIG=201;
 QBK:=LASTSIG<>201;
 QSP:=LASTSIG=200;
 QSK:=LASTSIG<>200;
+
 
 RSV:=(C-LLV(L,63))/(HHV(H,63)-LLV(L,63))*100;
 K:=SMA(RSV,18,1);
@@ -310,25 +312,41 @@ def jingubang(bars):
 
 
     # 计算第二部分数据
-    # OC = getDayFirstBarOC(bars)
-    OC = pd.read_json('oc.json')
+    # OO, CC = getDayFirstBarOC(bars)
+    oo = pd.read_json('oo.json')
+    cc = pd.read_json('cc.json')
+
+    # llv63 = pd.Series(LLV(L, 63))
+    # hhv63 = pd.Series(HHV(H, 63))
+
+    # RSV = (C - llv63) / (hhv63 - llv63) * 100
+    # K = sma(RSV, 18, 1)
+    # MAA = ema(C, 255)
+
+    # CbMAA = C > MAA
+    # CsMAA = C < MAA
+    # CbREFC = C > ref(C, 1)
+    # CsREFC = C < ref(C, 1)
 
     TMP = std(O + C, 93) / 2
 
-    for i in range(len(O)):
-
+    bb = []
+    dd = []
+    for i in range(len(bars)):
         tmp = TMP.iloc[i]
-        # print(tmp, type(tmp), str(tmp))
-        if str(tmp) == 'nan':
-            continue
+        OO = oo.iloc[i].OO
+        CC = cc.iloc[i].CC
 
-        OO = OC.iloc[i].OO
-        CC = OC.iloc[i].CC
+        bbtmp = max(OO, CC) + 0.1 * 5 * tmp
+        ddtmp = min(OO, CC) - 0.1 * 5 * tmp
+        bb.append(bbtmp)
+        dd.append(ddtmp)
 
-        BB = max(OO, CC) + 0.1 * 5 * tmp
-        DD = min(OO, CC) - 0.1 * 5 * tmp
-        CbBB = C > BB
-        CsDD = C < DD
+    BB = pd.Series(bb)
+    DD = pd.Series(dd)
+
+    CbBB = C > BB
+    CsDD = C < DD
 
     # 计算第三部分数据
     sigall = []
@@ -359,7 +377,10 @@ def jingubang(bars):
 
     # 计算第五部分数据
     MAB = ema(C, 109)
-    RSV2 = (C - llv(L, 3)) / (hhv(H, 3) - llv(L, 3)) * 100
+    llvl3 = pd.Series(LLV(L,3))
+    hhvh3 = pd.Series(HHV(H, 3))
+    # RSV2 = (C - llv(L, 3)) / (hhv(H, 3) - llv(L, 3)) * 100
+    RSV2 = (C - llvl3) / (hhvh3 - llvl3) * 100
     KK = sma(RSV2, 59, 1)
     DD2 = sma(KK, 105, 1)
 
