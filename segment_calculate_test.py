@@ -35,6 +35,8 @@ L = bars.low
 
 
 
+
+
 def getDayFirstBarOC(bars):
     # 注意K线更新时需要更新
 
@@ -96,7 +98,7 @@ AA2 = abs(C-ref(C,2)) >= ref(hhvc_c35,1)
 
 
 # 计算第二部分数据 完全正确了.
-# OO, CC = getDayFirstBarOC(bars)
+OO, CC = getDayFirstBarOC(bars)
 
 oo = pd.read_json('oo.json')
 cc = pd.read_json('cc.json')

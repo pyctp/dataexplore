@@ -31,6 +31,7 @@ QBK:=LASTSIG<>201;
 QSP:=LASTSIG=200;
 QSK:=LASTSIG<>200;
 
+第一部分
 RSV:=(C-LLV(L,63))/(HHV(H,63)-LLV(L,63))*100;
 K:=SMA(RSV,18,1);
 MAA:=EMA(C,255);
@@ -48,6 +49,7 @@ AA2:=ABS(C-REF(C,2))>=REF(HHV(ABS(C-REF(C,2)),35),1);
  (CsMAA.iloc[i] and K>39 and ISDOWN and (AA or AA2) and BARSBK>50) and FANSHOU=1,SPK(SS);
  (C_MAA.iloc[i] and K>39 and ISDOWN and (AA or AA2) and BARSBK>50) and QSP,SP(BKVOL);
 
+第二部分
 TMP:=STD(O+C,93)/2;
 OO:=VALUEWHEN(DATE<>REF(DATE,1),O);
 CC:=VALUEWHEN(DATE<>REF(DATE,1),C);
@@ -62,6 +64,7 @@ DD:=MIN(OO,CC)-0.1*5*TMP;
  (CsMAA.iloc[i] and K>39 and C<REF(C,1) and (C<DD and C<BKPRICE)) and FANSHOU=0 and QSK,SK(SS);
  (CsMAA.iloc[i] and K>39 and C<REF(C,1) and (C<DD and C<BKPRICE)) and FANSHOU=1,SPK(SS);
 
+第三部分
 RC:=C/REF(C,1);
 ARC:=SMA(REF(RC,1),177,1);
 MA1:=MA(C,85);
@@ -74,6 +77,7 @@ MA2:=MA(C,190);
  (CROSS(MA2,MA1) and ARC<1) and FANSHOU=0 and QSK,SK(SS);
  (CROSS(MA2,MA1) and ARC<1) and FANSHOU=1,SPK(SS);
 
+第四部分
 VAR1:=(2*C+H+L)/4;
 VAR2:=LLV(L,63);
 VAR3:=HHV(H,63);
@@ -93,6 +97,7 @@ SH:=EMA(0.7*REF(ZL,1)+0.3*ZL,118);
  (CROSS(SH,ZL) and ZL>72) and FANSHOU=0 and QSK,SK(SS);
  (CROSS(SH,ZL) and ZL>72) and FANSHOU=1,SPK(SS);
 
+第五部分
 MAB:=EMA(C,109);
 RSV2:=(C-LLV(L,3))/(HHV(H,3)-LLV(L,3))*100;
 KK:=SMA(RSV2,59,1);

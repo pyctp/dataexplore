@@ -217,38 +217,49 @@ def getLastSig():
     else:
         return None
 
-bar_json_file = 'rb2005_900.json'
-bars = pd.read_json(bar_json_file)
-from datetime import date
 
 
 def getDayFirstBarOC(bars):
     # 注意K线更新时需要更新
-    date=pd.Timestamp.date
-    oc = pd.DataFrame(columns=('datetime', 'OO', 'CC'))
-    # oc.set_index('datetime')
+
+    oo = pd.DataFrame(columns=('datetime', 'OO'))
+    cc = pd.DataFrame(columns=('datetime', 'CC'))
 
     for i in range(len(bars)):
         if i == 0:
             OO = bars.iloc[0].open
             CC = bars.iloc[0].close
-            oc = oc.append({'datetime': bars.iloc[0].datetime, 'OO': OO, 'CC': CC}, ignore_index=True)
+            oo = oo.append({'datetime': bars.iloc[0].datetime, 'OO': OO}, ignore_index=True)
+            cc = cc.append({'datetime': bars.iloc[0].datetime, 'CC': CC}, ignore_index=True)
 
         else:
-
-            print(date(bars.iloc[i].datetime))
-            if pd.Timestamp.date(bars.iloc[i].datetime) != pd.Timestamp.date(bars.iloc[i-1].datetime):
-                OO = bars.iloc[i-2].open
-                CC = bars.iloc[i-2].close
-                oc = oc.append({'datetime': bars.iloc[i].datetime, 'OO': OO, 'CC': CC}, ignore_index=True)
+            hourtmp=bars.iloc[i].datetime.hour
+            # daytmp=bars.iloc[i].datetime.day
+            minutetmp=bars.iloc[i].datetime.minute
+            # print(daytmp, hourtmp, minutetmp)
+            #bars.iloc[i].datetime.day != bars.iloc[i-1].datetime.day
+            if hourtmp == 21 and minutetmp == 0:
+                print(bars.iloc[i].datetime)
+                OO = bars.iloc[i].open
+                CC = bars.iloc[i].close
+                oo = oo.append({'datetime': bars.iloc[i].datetime, 'OO': OO}, ignore_index=True)
+                cc = cc.append({'datetime': bars.iloc[i].datetime, 'CC': CC}, ignore_index=True)
 
             else:
-                OO = oc.iloc[-1].OO  # 这样对吗?
-                CC = oc.iloc[-1].CC
-                oc = oc.append({'datetime': bars.iloc[i].datetime, 'OO': OO, 'CC': CC}, ignore_index=True)
+                OO = oo.iloc[-1].OO  #
+                CC = cc.iloc[-1].CC
+                oo = oo.append({'datetime': bars.iloc[i].datetime, 'OO': OO}, ignore_index=True)
+                cc = cc.append({'datetime': bars.iloc[i].datetime, 'CC': CC}, ignore_index=True)
 
-    oc.to_json('oc.json')
-    return oc
+    oo.to_json('oo.json')
+    cc.to_json('cc.json')
+    return oo, cc
+
+
+
+bar_json_file = 'rb2005_900.json'
+bars = pd.read_json(bar_json_file)
+from datetime import date
 
 # LASTSIG = getLastSig()
 
@@ -279,6 +290,8 @@ STOP:207;
 '''
 lastsig = []
 sigall = []
+
+
 
 def jingubang(bars):
     global lastsig, sigall
